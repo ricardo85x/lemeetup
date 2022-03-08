@@ -1,4 +1,4 @@
-import { Flex, Box, Text, Input, Button } from "@chakra-ui/react";
+import { Flex, Box, Text, Input, Button, useToast } from "@chakra-ui/react";
 import { NextPage } from "next";
 import Router from "next/router";
 import { FormEvent, useEffect } from "react";
@@ -7,24 +7,29 @@ import { useAuth } from "../hooks/useAuth";
 
 const Register: NextPage = () => {
 
+  const toast = useToast()
+
   const [email, setEmail] = useState<string>("")
   const [password, setPassword] = useState<string>("")
-  const { register, hasError } = useAuth()
+
+  const { register } = useAuth()
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (email && password) {
-      await register({ email, password })
-
-      if (!hasError) {
-        alert("User registration completed successfully")
+      if (await register({ email, password })) {
         Router.push("/login")
       } else {
-        alert("User registration failed!")
+        toast({
+          title: 'Invalid email or password',
+          description: "Try again",
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+          position: 'top-end',
+
+        })
       }
-
-
-
     }
   }
 
